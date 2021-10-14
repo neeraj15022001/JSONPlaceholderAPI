@@ -7,15 +7,17 @@ class CardGrid extends React.Component {
     super();
     this.state = {
       data: [],
+      loading: true,
     };
   }
-  componentDidMount = async () => {
-    const data = await this.fetchData()
-      .then((res) => res)
+  componentDidMount() {
+    this.fetchData()
+      .then((res) => {
+        this.setState({ data: res, loading: false });
+        return res;
+      })
       .catch((error) => console.log(error));
-    console.log(data);
-    this.setState({ data: data });
-  };
+  }
   fetchData = async () => {
     let data = "";
     data = await fetch("https://jsonplaceholder.typicode.com/posts")
@@ -30,9 +32,10 @@ class CardGrid extends React.Component {
     return (
       <div className="mt-20">
         <div className="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 py-5 px-20 gap-10">
-          {data.map((item) => (
-            <Card item={item} key={item.id} />
-          ))}
+          {this.state.loading && (
+            <h1 className="animate-pulse text-8xl">Loading...</h1>
+          )}
+          {data && data.map((item) => <Card item={item} key={item.id} />)}
         </div>
       </div>
     );
